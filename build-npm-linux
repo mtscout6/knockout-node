@@ -1,0 +1,21 @@
+#!/bin/sh
+
+OutFile='npm/lib/knockout.js'
+rm -rf $OutFile.temp
+
+# Combine the source files
+SourceFiles=`grep js < src/build/source-references.js | # Find JS references 
+             sed "s/[ \',]//g" |              # Strip off JSON fluff (whitespace, commas, quotes)
+             sed -e 's/.*/src\/&/' |           # Fix the paths by prefixing with ../
+             tr '\n' ' '`                     # Combine into single line
+cat src/build/amd-pre.js                      > $OutFile.temp
+cat $SourceFiles                              >> $OutFile.temp
+cat src/build/amd-post.js                     >> $OutFile.temp
+
+# Finalise each file by prefixing with version header and surrounding in function closure
+cp src/build/version-header.js $OutFile
+cat node-npm-header.js                                 >> $OutFile
+echo "(function(window,document,navigator,undefined){" >> $OutFile
+cat $OutFile.temp                                      >> $OutFile
+echo "})(window,document,navigator);"                  >> $OutFile
+rm -rf $OutFile.temp
