@@ -1,4 +1,4 @@
-// Knockout JavaScript library v2.0.0
+// Knockout JavaScript library v2.1.0pre
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
@@ -7,11 +7,27 @@ var jsdom = require('jsdom').jsdom,
     window = document.createWindow(),
     navigator = window.navigator;
 (function(window,document,navigator,undefined){
-var ko = window["ko"] = {};
+!function(factory) {
+    // Support AMD where available and opted in via define.amd.ko
+    if (typeof define === 'function' && define['amd'] && define['amd']['ko']) {
+        // Register as an AMD anonymous module
+        define(['exports'], factory);
+    } else {
+        // AMD not in use (e.g., when referenced via aplain <script> tag) - put ko directly in global namespace
+        factory(window['ko'] = {});
+    }
+}(function(koExports){
+// Internally, all KO objects are attached to koExports (even the non-exported ones whose names will be minified by the closure compiler).
+// In the future, the following "ko" variable may be made distinct from "koExports" so that private objects are not externally reachable.
+var ko = typeof koExports !== 'undefined' ? koExports : {};
 // Google Closure Compiler helpers (used only to make the minified file smaller)
-ko.exportSymbol = function(publicPath, object) {
-	var tokens = publicPath.split(".");
-	var target = window;
+ko.exportSymbol = function(koPath, object) {
+	var tokens = koPath.split(".");
+	
+	// In the future, "ko" may become distinct from "koExports" (so that non-exported objects are not reachable)
+	// At that point, "target" would be set to: (typeof koExports !== "undefined" ? koExports : ko)
+	var target = ko;
+
 	for (var i = 0; i < tokens.length - 1; i++)
 		target = target[tokens[i]];
 	target[tokens[tokens.length - 1]] = object;
@@ -19,6 +35,7 @@ ko.exportSymbol = function(publicPath, object) {
 ko.exportProperty = function(owner, publicName, object) {
   owner[publicName] = object;
 };
+
 ko.utils = new (function () {
     var stringTrimRegex = /^(\s|\u00A0)+|(\s|\u00A0)+$/g;
     
@@ -416,30 +433,26 @@ ko.utils = new (function () {
     }
 })();
 
-ko.exportSymbol('ko.utils', ko.utils);
-ko.utils.arrayForEach([
-    ['arrayForEach', ko.utils.arrayForEach],
-    ['arrayFirst', ko.utils.arrayFirst],
-    ['arrayFilter', ko.utils.arrayFilter],
-    ['arrayGetDistinctValues', ko.utils.arrayGetDistinctValues],
-    ['arrayIndexOf', ko.utils.arrayIndexOf],
-    ['arrayMap', ko.utils.arrayMap],
-    ['arrayPushAll', ko.utils.arrayPushAll],
-    ['arrayRemoveItem', ko.utils.arrayRemoveItem],
-    ['extend', ko.utils.extend],
-    ['fieldsIncludedWithJsonPost', ko.utils.fieldsIncludedWithJsonPost],
-    ['getFormFields', ko.utils.getFormFields],
-    ['postJson', ko.utils.postJson],
-    ['parseJson', ko.utils.parseJson],
-    ['registerEventHandler', ko.utils.registerEventHandler],
-    ['stringifyJson', ko.utils.stringifyJson],
-    ['range', ko.utils.range],
-    ['toggleDomNodeCssClass', ko.utils.toggleDomNodeCssClass],
-    ['triggerEvent', ko.utils.triggerEvent],
-    ['unwrapObservable', ko.utils.unwrapObservable]
-], function(item) {
-    ko.exportSymbol('ko.utils.' + item[0], item[1]);
-});
+ko.exportSymbol('utils', ko.utils);
+ko.exportSymbol('utils.arrayForEach', ko.utils.arrayForEach);
+ko.exportSymbol('utils.arrayFirst', ko.utils.arrayFirst);
+ko.exportSymbol('utils.arrayFilter', ko.utils.arrayFilter);
+ko.exportSymbol('utils.arrayGetDistinctValues', ko.utils.arrayGetDistinctValues);
+ko.exportSymbol('utils.arrayIndexOf', ko.utils.arrayIndexOf);
+ko.exportSymbol('utils.arrayMap', ko.utils.arrayMap);
+ko.exportSymbol('utils.arrayPushAll', ko.utils.arrayPushAll);
+ko.exportSymbol('utils.arrayRemoveItem', ko.utils.arrayRemoveItem);
+ko.exportSymbol('utils.extend', ko.utils.extend);
+ko.exportSymbol('utils.fieldsIncludedWithJsonPost', ko.utils.fieldsIncludedWithJsonPost);
+ko.exportSymbol('utils.getFormFields', ko.utils.getFormFields);
+ko.exportSymbol('utils.postJson', ko.utils.postJson);
+ko.exportSymbol('utils.parseJson', ko.utils.parseJson);
+ko.exportSymbol('utils.registerEventHandler', ko.utils.registerEventHandler);
+ko.exportSymbol('utils.stringifyJson', ko.utils.stringifyJson);
+ko.exportSymbol('utils.range', ko.utils.range);
+ko.exportSymbol('utils.toggleDomNodeCssClass', ko.utils.toggleDomNodeCssClass);
+ko.exportSymbol('utils.triggerEvent', ko.utils.triggerEvent);
+ko.exportSymbol('utils.unwrapObservable', ko.utils.unwrapObservable);
 
 if (!Function.prototype['bind']) {
     // Function.prototype.bind is a standard part of ECMAScript 5th Edition (December 2009, http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf)
@@ -451,6 +464,7 @@ if (!Function.prototype['bind']) {
         }; 
     };
 }
+
 ko.utils.domData = new (function () {
     var uniqueId = 0;
     var dataStoreKeyExpandoPropertyName = "__ko__" + (new Date).getTime();
@@ -490,8 +504,8 @@ ko.utils.domData = new (function () {
     }
 })();
 
-ko.exportSymbol('ko.utils.domData', ko.utils.domData);
-ko.exportSymbol('ko.utils.domData.clear', ko.utils.domData.clear); // Exporting only so specs can clear up after themselves fully
+ko.exportSymbol('utils.domData', ko.utils.domData);
+ko.exportSymbol('utils.domData.clear', ko.utils.domData.clear); // Exporting only so specs can clear up after themselves fully
 ko.utils.domNodeDisposal = new (function () {
     var domDataKey = "__ko_domNodeDisposal__" + (new Date).getTime();
     
@@ -563,11 +577,11 @@ ko.utils.domNodeDisposal = new (function () {
 })();
 ko.cleanNode = ko.utils.domNodeDisposal.cleanNode; // Shorthand name for convenience
 ko.removeNode = ko.utils.domNodeDisposal.removeNode; // Shorthand name for convenience
-ko.exportSymbol('ko.cleanNode', ko.cleanNode); 
-ko.exportSymbol('ko.removeNode', ko.removeNode);
-ko.exportSymbol('ko.utils.domNodeDisposal', ko.utils.domNodeDisposal);
-ko.exportSymbol('ko.utils.domNodeDisposal.addDisposeCallback', ko.utils.domNodeDisposal.addDisposeCallback);
-ko.exportSymbol('ko.utils.domNodeDisposal.removeDisposeCallback', ko.utils.domNodeDisposal.removeDisposeCallback);(function () {
+ko.exportSymbol('cleanNode', ko.cleanNode); 
+ko.exportSymbol('removeNode', ko.removeNode);
+ko.exportSymbol('utils.domNodeDisposal', ko.utils.domNodeDisposal);
+ko.exportSymbol('utils.domNodeDisposal.addDisposeCallback', ko.utils.domNodeDisposal.addDisposeCallback);
+ko.exportSymbol('utils.domNodeDisposal.removeDisposeCallback', ko.utils.domNodeDisposal.removeDisposeCallback);(function () {
     var leadingCommentRegex = /^(\s*)<!--(.*?)-->/;
 
     function simpleHtmlParse(html) {
@@ -650,8 +664,9 @@ ko.exportSymbol('ko.utils.domNodeDisposal.removeDisposeCallback', ko.utils.domNo
     };
 })();
 
-ko.exportSymbol('ko.utils.parseHtmlFragment', ko.utils.parseHtmlFragment);
-ko.exportSymbol('ko.utils.setHtml', ko.utils.setHtml);
+ko.exportSymbol('utils.parseHtmlFragment', ko.utils.parseHtmlFragment);
+ko.exportSymbol('utils.setHtml', ko.utils.setHtml);
+
 ko.memoization = (function () {
     var memos = {};
 
@@ -716,11 +731,11 @@ ko.memoization = (function () {
     };
 })();
 
-ko.exportSymbol('ko.memoization', ko.memoization);
-ko.exportSymbol('ko.memoization.memoize', ko.memoization.memoize);
-ko.exportSymbol('ko.memoization.unmemoize', ko.memoization.unmemoize);
-ko.exportSymbol('ko.memoization.parseMemoText', ko.memoization.parseMemoText);
-ko.exportSymbol('ko.memoization.unmemoizeDomNodeAndDescendants', ko.memoization.unmemoizeDomNodeAndDescendants);
+ko.exportSymbol('memoization', ko.memoization);
+ko.exportSymbol('memoization.memoize', ko.memoization.memoize);
+ko.exportSymbol('memoization.unmemoize', ko.memoization.unmemoize);
+ko.exportSymbol('memoization.parseMemoText', ko.memoization.parseMemoText);
+ko.exportSymbol('memoization.unmemoizeDomNodeAndDescendants', ko.memoization.unmemoizeDomNodeAndDescendants);
 ko.extenders = {
     'throttle': function(target, timeout) {
         // Throttling means two things:
@@ -764,7 +779,8 @@ function applyExtenders(requestedExtenders) {
     return target;
 }
 
-ko.exportSymbol('ko.extenders', ko.extenders);
+ko.exportSymbol('extenders', ko.extenders);
+
 ko.subscription = function (callback, disposeCallback) {
     this.callback = callback;
     this.disposeCallback = disposeCallback;
@@ -830,8 +846,8 @@ ko.isSubscribable = function (instance) {
     return typeof instance.subscribe == "function" && typeof instance["notifySubscribers"] == "function";
 };
 
-ko.exportSymbol('ko.subscribable', ko.subscribable);
-ko.exportSymbol('ko.isSubscribable', ko.isSubscribable);
+ko.exportSymbol('subscribable', ko.subscribable);
+ko.exportSymbol('isSubscribable', ko.isSubscribable);
 
 ko.dependencyDetection = (function () {
     var _frames = [];
@@ -917,9 +933,9 @@ ko.isWriteableObservable = function (instance) {
 }
 
 
-ko.exportSymbol('ko.observable', ko.observable);
-ko.exportSymbol('ko.isObservable', ko.isObservable);
-ko.exportSymbol('ko.isWriteableObservable', ko.isWriteableObservable);
+ko.exportSymbol('observable', ko.observable);
+ko.exportSymbol('isObservable', ko.isObservable);
+ko.exportSymbol('isWriteableObservable', ko.isWriteableObservable);
 ko.observableArray = function (initialValues) {
     if (arguments.length == 0) {
         // Zero-parameter constructor initializes to empty array
@@ -1040,7 +1056,7 @@ ko.utils.arrayForEach(["slice"], function (methodName) {
     };
 });
 
-ko.exportSymbol('ko.observableArray', ko.observableArray);
+ko.exportSymbol('observableArray', ko.observableArray);
 function prepareOptions(evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
     if (evaluatorFunctionOrOptions && typeof evaluatorFunctionOrOptions == "object") {
         // Single-parameter syntax - everything is on this "options" param
@@ -1167,8 +1183,9 @@ ko.dependentObservable['fn'] = {
 
 ko.dependentObservable.__ko_proto__ = ko.observable;
 
-ko.exportSymbol('ko.dependentObservable', ko.dependentObservable);
-ko.exportSymbol('ko.computed', ko.dependentObservable); // Make "ko.computed" an alias for "ko.dependentObservable"
+ko.exportSymbol('dependentObservable', ko.dependentObservable);
+ko.exportSymbol('computed', ko.dependentObservable); // Make "ko.computed" an alias for "ko.dependentObservable"
+
 (function() {    
     var maxNestedObservableDepth = 10; // Escape the (unlikely) pathalogical case where an observable's current value is itself (or similar reference cycle)
     
@@ -1253,8 +1270,8 @@ ko.exportSymbol('ko.computed', ko.dependentObservable); // Make "ko.computed" an
     };
 })();
 
-ko.exportSymbol('ko.toJS', ko.toJS);
-ko.exportSymbol('ko.toJSON', ko.toJSON);(function () {
+ko.exportSymbol('toJS', ko.toJS);
+ko.exportSymbol('toJSON', ko.toJSON);(function () {
     var hasDomDataExpandoProperty = '__ko__hasDomDataOptionValue__';
 
     // Normally, SELECT elements and their OPTIONs can only take value of type 'string' (because the values
@@ -1307,9 +1324,9 @@ ko.exportSymbol('ko.toJSON', ko.toJSON);(function () {
     };        
 })();
 
-ko.exportSymbol('ko.selectExtensions', ko.selectExtensions);
-ko.exportSymbol('ko.selectExtensions.readValue', ko.selectExtensions.readValue);
-ko.exportSymbol('ko.selectExtensions.writeValue', ko.selectExtensions.writeValue);
+ko.exportSymbol('selectExtensions', ko.selectExtensions);
+ko.exportSymbol('selectExtensions.readValue', ko.selectExtensions.readValue);
+ko.exportSymbol('selectExtensions.writeValue', ko.selectExtensions.writeValue);
 
 ko.jsonExpressionRewriting = (function () {
     var restoreCapturedTokensRegex = /\@ko_token_(\d+)\@/g;
@@ -1478,10 +1495,10 @@ ko.jsonExpressionRewriting = (function () {
     };
 })();
 
-ko.exportSymbol('ko.jsonExpressionRewriting', ko.jsonExpressionRewriting);
-ko.exportSymbol('ko.jsonExpressionRewriting.bindingRewriteValidators', ko.jsonExpressionRewriting.bindingRewriteValidators);
-ko.exportSymbol('ko.jsonExpressionRewriting.parseObjectLiteral', ko.jsonExpressionRewriting.parseObjectLiteral);
-ko.exportSymbol('ko.jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko.jsonExpressionRewriting.insertPropertyAccessorsIntoJson);
+ko.exportSymbol('jsonExpressionRewriting', ko.jsonExpressionRewriting);
+ko.exportSymbol('jsonExpressionRewriting.bindingRewriteValidators', ko.jsonExpressionRewriting.bindingRewriteValidators);
+ko.exportSymbol('jsonExpressionRewriting.parseObjectLiteral', ko.jsonExpressionRewriting.parseObjectLiteral);
+ko.exportSymbol('jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko.jsonExpressionRewriting.insertPropertyAccessorsIntoJson);
 (function() {
     // "Virtual elements" is an abstraction on top of the usual DOM API which understands the notion that comment nodes
     // may be used to represent hierarchy (in addition to the DOM's natural hierarchy). 
@@ -1738,7 +1755,8 @@ ko.exportSymbol('ko.jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko
     }    
 })();
 
-ko.exportSymbol('ko.bindingProvider', ko.bindingProvider);(function () {
+ko.exportSymbol('bindingProvider', ko.bindingProvider);
+(function () {
     ko.bindingHandlers = {};
 
     ko.bindingContext = function(dataItem, parentBindingContext) {
@@ -1921,12 +1939,12 @@ ko.exportSymbol('ko.bindingProvider', ko.bindingProvider);(function () {
         return context ? context['$data'] : undefined;
     };    
     
-    ko.exportSymbol('ko.bindingHandlers', ko.bindingHandlers);
-    ko.exportSymbol('ko.applyBindings', ko.applyBindings);
-    ko.exportSymbol('ko.applyBindingsToDescendants', ko.applyBindingsToDescendants);
-    ko.exportSymbol('ko.applyBindingsToNode', ko.applyBindingsToNode);
-    ko.exportSymbol('ko.contextFor', ko.contextFor);
-    ko.exportSymbol('ko.dataFor', ko.dataFor);
+    ko.exportSymbol('bindingHandlers', ko.bindingHandlers);
+    ko.exportSymbol('applyBindings', ko.applyBindings);
+    ko.exportSymbol('applyBindingsToDescendants', ko.applyBindingsToDescendants);
+    ko.exportSymbol('applyBindingsToNode', ko.applyBindingsToNode);
+    ko.exportSymbol('contextFor', ko.contextFor);
+    ko.exportSymbol('dataFor', ko.dataFor);
 })();// For certain common events (currently just 'click'), allow a simplified data-binding syntax
 // e.g. click:handler instead of the usual full-length event:{click:handler}
 var eventHandlersWithShortcuts = ['click'];
@@ -2470,7 +2488,8 @@ ko.bindingHandlers['foreach'] = {
 };
 ko.jsonExpressionRewriting.bindingRewriteValidators['foreach'] = false; // Can't rewrite control flow bindings
 ko.virtualElements.allowedBindings['foreach'] = true;
-ko.exportSymbol('ko.allowedVirtualElementBindings', ko.virtualElements.allowedBindings);// If you want to make a custom template engine,
+ko.exportSymbol('allowedVirtualElementBindings', ko.virtualElements.allowedBindings);
+// If you want to make a custom template engine,
 // 
 // [1] Inherit from this class (like ko.nativeTemplateEngine does)
 // [2] Override 'renderTemplateSource', supplying a function with this signature:
@@ -2551,7 +2570,8 @@ ko.templateEngine.prototype['rewriteTemplate'] = function (template, rewriterCal
     }
 };
 
-ko.exportSymbol('ko.templateEngine', ko.templateEngine);
+ko.exportSymbol('templateEngine', ko.templateEngine);
+
 ko.templateRewriting = (function () {
     var memoizeDataBindingAttributeSyntaxRegex = /(<[a-z]+\d*(\s+(?!data-bind=)[a-z0-9\-]+(=(\"[^\"]*\"|\'[^\']*\'))?)*\s+)data-bind=(["'])([\s\S]*?)\5/gi;
     var memoizeVirtualContainerBindingSyntaxRegex = /<!--\s*ko\b\s*([\s\S]*?)\s*-->/g;
@@ -2613,8 +2633,8 @@ ko.templateRewriting = (function () {
     }
 })();
 
-ko.exportSymbol('ko.templateRewriting', ko.templateRewriting);
-ko.exportSymbol('ko.templateRewriting.applyMemoizedBindingsToNextSibling', ko.templateRewriting.applyMemoizedBindingsToNextSibling); // Exported only because it has to be referenced by string lookup from within rewritten template
+ko.exportSymbol('templateRewriting', ko.templateRewriting);
+ko.exportSymbol('templateRewriting.applyMemoizedBindingsToNextSibling', ko.templateRewriting.applyMemoizedBindingsToNextSibling); // Exported only because it has to be referenced by string lookup from within rewritten template
 (function() { 
     // A template source represents a read/write way of accessing a template. This is to eliminate the need for template loading/saving
     // logic to be duplicated in every template engine (and means they can all work with anonymous templates, etc.)
@@ -2678,9 +2698,9 @@ ko.exportSymbol('ko.templateRewriting.applyMemoizedBindingsToNextSibling', ko.te
         }
     };
     
-    ko.exportSymbol('ko.templateSources', ko.templateSources);
-    ko.exportSymbol('ko.templateSources.domElement', ko.templateSources.domElement);
-    ko.exportSymbol('ko.templateSources.anonymousTemplate', ko.templateSources.anonymousTemplate);
+    ko.exportSymbol('templateSources', ko.templateSources);
+    ko.exportSymbol('templateSources.domElement', ko.templateSources.domElement);
+    ko.exportSymbol('templateSources.anonymousTemplate', ko.templateSources.anonymousTemplate);
 })();
 (function () {
     var _templateEngine;
@@ -2904,8 +2924,9 @@ ko.exportSymbol('ko.templateRewriting.applyMemoizedBindingsToNextSibling', ko.te
     ko.virtualElements.allowedBindings['template'] = true;
 })();
 
-ko.exportSymbol('ko.setTemplateEngine', ko.setTemplateEngine);
-ko.exportSymbol('ko.renderTemplate', ko.renderTemplate);
+ko.exportSymbol('setTemplateEngine', ko.setTemplateEngine);
+ko.exportSymbol('renderTemplate', ko.renderTemplate);
+
 (function () {
     // Simple calculation based on Levenshtein distance.
     function calculateEditDistanceMatrix(oldArray, newArray, maxAllowedDistance) {
@@ -2987,7 +3008,7 @@ ko.exportSymbol('ko.renderTemplate', ko.renderTemplate);
     };    
 })();
 
-ko.exportSymbol('ko.utils.compareArrays', ko.utils.compareArrays);
+ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
 
 (function () {
     // Objective:
@@ -3142,7 +3163,7 @@ ko.exportSymbol('ko.utils.compareArrays', ko.utils.compareArrays);
     }
 })();
 
-ko.exportSymbol('ko.utils.setDomNodeChildrenFromArrayMapping', ko.utils.setDomNodeChildrenFromArrayMapping);
+ko.exportSymbol('utils.setDomNodeChildrenFromArrayMapping', ko.utils.setDomNodeChildrenFromArrayMapping);
 ko.nativeTemplateEngine = function () {
     this['allowTemplateRewriting'] = false;
 }
@@ -3156,7 +3177,7 @@ ko.nativeTemplateEngine.prototype['renderTemplateSource'] = function (templateSo
 ko.nativeTemplateEngine.instance = new ko.nativeTemplateEngine();
 ko.setTemplateEngine(ko.nativeTemplateEngine.instance);
 
-ko.exportSymbol('ko.nativeTemplateEngine', ko.nativeTemplateEngine);(function() {
+ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);(function() {
     ko.jqueryTmplTemplateEngine = function () {
         // Detect which version of jquery-tmpl you're using. Unfortunately jquery-tmpl 
         // doesn't expose a version number, so we have to infer it.
@@ -3235,5 +3256,6 @@ ko.exportSymbol('ko.nativeTemplateEngine', ko.nativeTemplateEngine);(function() 
     if (jqueryTmplTemplateEngineInstance.jQueryTmplVersion > 0)
         ko.setTemplateEngine(jqueryTmplTemplateEngineInstance);
     
-    ko.exportSymbol('ko.jqueryTmplTemplateEngine', ko.jqueryTmplTemplateEngine);
-})();})(window,document,navigator);
+    ko.exportSymbol('jqueryTmplTemplateEngine', ko.jqueryTmplTemplateEngine);
+})();});
+})(window,document,navigator);
