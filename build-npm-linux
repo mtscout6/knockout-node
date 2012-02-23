@@ -3,17 +3,10 @@
 OutFile='npm/lib/knockout.js'
 PackageFile='npm/package.json'
 
-Version=`cat src/build/fragments/version.txt`
-VersionHeaderPath='src/build/fragments/version-header.js'
-VersionJsPath='src/src/version.js'
-sed "s/##VERSION##/$Version/" <$VersionHeaderPath > $VersionHeaderPath.temp
-sed "s/Working-Debug/$Version/" <$VersionJsFile > $VersionJsFile.temp
-
 # Combine the source files
 SourceFiles=`grep js < src/build/fragments/source-references.js | # Find JS references 
              sed "s/[ \',]//g" |              # Strip off JSON fluff (whitespace, commas, quotes)
              sed -e 's/.*/src\/&/' |          # Fix the paths by prefixing with ../
-             sed "s/version\.js/version\.js\.temp/" |    # Use a temporary version with correct version number
              tr '\n' ' '`                     # Combine into single line
 cat src/build/fragments/amd-pre.js                     >  $OutFile.temp
 cat $SourceFiles                                       >> $OutFile.temp
@@ -21,13 +14,15 @@ cat src/build/fragments/amd-post.js                    >> $OutFile.temp
 
 # Finalise file by prefixing with version header and surrounding in function closure
 # cp src/build/fragments/version-header.js $OutFile
-cat $VersionHeaderPath.temp                            >  $OutFile
 cat node-npm-header.js                                 >> $OutFile
 echo "(function(window,document,navigator,undefined){" >> $OutFile
 cat $OutFile.temp                                      >> $OutFile
 echo "})(window,document,navigator);"                  >> $OutFile
 rm -rf $OutFile.temp
-rm -rf $VersionHeaderPath.temp
+
+# Inject the version number string
+Version=`cat src/build/fragments/version.txt`
+sed -i~ -e "s/##VERSION##/$Version/g" $OutFile
 
 rm -rf $PackageFile
 
