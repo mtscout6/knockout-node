@@ -11,6 +11,6 @@
   "contributors"  : ["Matthew Smith <mtscout6@gmail.com>"],
   "maintainers"   : "Matthew Smith <mtscout6@gmail.com>",
   "licenses"      : ["MIT"],
-  "dependencies"  : {"jsdom" : ">=0.2.8"},
+  "dependencies"  : {"jsdom" : "=0.2.1"},
   "main"          : "bin/knockout"
 }
