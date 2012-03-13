@@ -3,6 +3,8 @@
 OutFile='npm/lib/knockout.js'
 PackageFile='npm/package.json'
 
+rm -rf $OutFile
+
 # Combine the source files
 SourceFiles=`grep js < src/build/fragments/source-references.js | # Find JS references 
              sed "s/[ \',]//g" |              # Strip off JSON fluff (whitespace, commas, quotes)
@@ -32,13 +34,13 @@ echo "  \"version\"       : \""$Version"\","                                 >> 
 echo "  \"description\"   : \"NodeJs Testable version of client script which Simplifies Dynamic JavaScript UIs by applying the Model-View-ViewModel (MVVM) Pattern.\"," >> $PackageFile
 echo "  \"repository\"    : {"                                               >> $PackageFile
 echo "    \"type\"        : \"git\","                                        >> $PackageFile
-echo "    \"url\"         : \"https://github.com/mtscout6/knockout-node\","  >> $PackageFile
+echo "    \"url\"         : \"https://github.com/mtscout6/knockout-node\""   >> $PackageFile
 echo "  },"                                                                  >> $PackageFile
 echo "  \"keywords\"      : [\"testing\", \"mvvm\"],"                        >> $PackageFile
 echo "  \"author\"        : \"Steven Sanderson\","                           >> $PackageFile
 echo "  \"contributors\"  : [\"Matthew Smith <mtscout6@gmail.com>\"],"       >> $PackageFile
 echo "  \"maintainers\"   : \"Matthew Smith <mtscout6@gmail.com>\","         >> $PackageFile
 echo "  \"licenses\"      : [\"MIT\"],"                                      >> $PackageFile
-echo "  \"dependencies\"  : {\"jsdom\" : \">=0.2.8\"},"                      >> $PackageFile
-echo "  \"main\"          : \"bin/knockout\""                                >> $PackageFile
+echo "  \"dependencies\"  : {\"jsdom\" : \"=0.2.1\"},"                       >> $PackageFile
+echo "  \"main\"          : \"lib/knockout.js\""                             >> $PackageFile
 echo "}"                                                                     >> $PackageFile
