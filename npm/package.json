@@ -1,6 +1,6 @@
 {
   "name"          : "knockout",
-  "version"       : "2.1.0pre",
+  "version"       : "2.1.0",
   "description"   : "NodeJs Testable version of client script which Simplifies Dynamic JavaScript UIs by applying the Model-View-ViewModel (MVVM) Pattern.",
   "repository"    : {
     "type"        : "git",
